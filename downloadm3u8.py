@@ -44,10 +44,12 @@ async def download_file_with_semaphore(session, url, filename, semaphore):
 
 def concatenate_segments(input_dir, output_dir, output_file):
     segment_list = os.path.join(input_dir, 'segment_list.txt')
+    
     with open(segment_list, 'w') as f:
-        for filename in sorted(os.listdir(input_dir)):
-            if filename.endswith('.ts'):
-                f.write(f"file '{output_dir}\\{filename}'\n")
+        ts_files = sorted([file for file in os.listdir(input_dir) if file.endswith('.ts')])
+        for filename in ts_files:
+            f.write(f"file '{filename}'\n")
+
 
     ffmpeg_cmd = [
         'ffmpeg',
@@ -55,6 +57,8 @@ def concatenate_segments(input_dir, output_dir, output_file):
         '-safe', '0',
         '-i', segment_list,
         '-fflags', '+genpts+igndts',  # Add this line to force generation of PTS
+        '-map', '0:v',  # Map the video stream from the first input (0)
+        '-map', '0:a',  # Map the audio stream from the first input (0)
         '-c', 'copy',
         output_file
     ]
