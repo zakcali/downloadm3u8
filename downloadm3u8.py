@@ -22,8 +22,6 @@ async def download_file(session, url, filename):
         print(f"Failed to download {url}: {e}")
         raise
 
-# --- CHANGE 1: Simplify the parser drastically ---
-# It now only needs the m3u8 content and the original m3u8 URL for context.
 def parse_m3u8(content, m3u8_base_url):
     segments = []
     for line in content.split('\n'):
@@ -117,8 +115,6 @@ async def main():
                 m3u8_content = await response.text()
 
         print("Parsing m3u8 file...")
-        # --- CHANGE 2: Pass the original m3u8_url directly to the parser ---
-        # No need to manually handle base paths or query strings anymore.
         segments = parse_m3u8(m3u8_content, m3u8_url)
         
         if not segments:
@@ -143,3 +139,4 @@ if __name__ == "__main__":
         asyncio.run(main())
     except Exception as e:
         print(f"\nAn unexpected error occurred: {e}")
+
